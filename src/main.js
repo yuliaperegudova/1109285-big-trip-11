@@ -3,10 +3,12 @@ import {createCostTemplate} from "./components/cost.js";
 import {createMenuTemplate} from "./components/menu.js";
 import {createFilterTemplate} from "./components/filter.js";
 import {createSortTemplate} from "./components/sort.js";
-import {createPointTemplate} from "./components/point.js";
-import {createEditTemplate} from "./components/edit.js";
+import {createEventMarkup} from "./components/event.js";
+import {createEventEditTemplate} from "./components/edit.js";
+import {generateFilters} from "./mock/filter.js";
+import {generateEvents} from "./mock/point.js";
 
-const POINT_COUNT = 3;
+const EVENT_COUNT = 15;
 
 const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
@@ -22,13 +24,16 @@ render(tripMain, createTripInfoTemplate(), `afterbegin`);
 const tripInfo = document.querySelector(`.trip-info`);
 render(tripInfo, createCostTemplate(), `beforeend`);
 
+const filters = generateFilters();
+const events = generateEvents(EVENT_COUNT);
+
 render(tripMenuHeading, createMenuTemplate(), `afterend`);
-render(tripControls, createFilterTemplate(), `beforeend`);
+render(tripControls, createFilterTemplate(filters), `beforeend`);
 render(tripEvents, createSortTemplate(), `beforeend`);
 
-for (let i = 0; i < POINT_COUNT; i++) {
-  render(tripEvents, createPointTemplate(), `beforeend`);
+for (let i = 1; i < events.length; i++) {
+  render(tripEvents, createEventMarkup(events[i], i), `beforeend`);
 }
 
-const tripEventsList = document.querySelector(`.trip-events__list`);
-render(tripEventsList, createEditTemplate(), `beforeend`);
+render(tripEvents, createEventEditTemplate(events[0], true, 0), `afterbegin`);
+
