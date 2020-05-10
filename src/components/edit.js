@@ -1,5 +1,5 @@
 import {eventTypes, CITIES} from "../const.js";
-import {formatTime, castTimeFormat} from "../utils.js";
+import {formatTime, castTimeFormat, createElement} from "../utils.js";
 
 const createCitiesListItem = (citiesList) => {
   return citiesList
@@ -88,7 +88,7 @@ const createEventTypeGroupsMarkup = (events, index) => {
   return fieldSetsMarkup.join(`\n`);
 };
 
-export const createEventEditTemplate = (event, isNew, index) => {
+const createEventEditTemplate = (event, isNew, index) => {
   const {eventType, city, eventOptions, destination, price, dateStart, dateEnd} = event;
 
   const citiesList = createCitiesListItem(CITIES);
@@ -184,3 +184,28 @@ export const createEventEditTemplate = (event, isNew, index) => {
     </form>`
   );
 };
+
+export default class EventEdit {
+  constructor(event, isNew, index) {
+    this._event = event;
+    this._isNew = isNew;
+    this._index = index;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createEventEditTemplate(this._event, this._isNew, this._index);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+

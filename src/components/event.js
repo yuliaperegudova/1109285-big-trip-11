@@ -1,5 +1,5 @@
 import {MONTH_NAMES} from "../const.js";
-import {formatTime, formatTimeFromMs} from "../utils.js";
+import {formatTime, formatTimeFromMs, createElement} from "../utils.js";
 
 const createOptionsMarkup = (events) => {
   if (events && events.length) {
@@ -24,7 +24,7 @@ const createOptionsMarkup = (events) => {
   }
 };
 
-export const createEventMarkup = (event, index) => {
+const createEventMarkup = (event, index) => {
   const {eventType, city, eventOptions, price, dateStart, dateEnd} = event;
   const timeStartFormatted = formatTime(dateStart);
   const timeEndFormatted = formatTime(dateEnd);
@@ -65,3 +65,28 @@ export const createEventMarkup = (event, index) => {
     </ul>`
   );
 };
+
+export default class Event {
+  constructor(event, index) {
+    this._event = event;
+    this._index = index;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createEventMarkup(this._event, this._index); // нужно добавить индекс
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+
