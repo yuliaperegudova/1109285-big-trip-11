@@ -51,8 +51,6 @@ render(tripControls, new FilterComponent(filters).getElement(), RenderPosition.B
 
 render(tripEvents, new SortComponent().getElement(), RenderPosition.BEFOREEND);
 
-// render(tripEvents, new EventEditComponent(events[0], true, 0).getElement(), RenderPosition.BEFOREEND);
-
 for (let i = 1; i < events.length; i++) {
   renderEvent(tripEvents, events[i], i);
 }
