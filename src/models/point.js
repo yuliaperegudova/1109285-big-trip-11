@@ -1,10 +1,10 @@
 export default class Point {
   constructor(data) {
+    this.id = data[`id`];
     this.basePrice = data[`base_price`];
     this.timeStart = new Date(data[`date_from`]);
     this.timeEnd = new Date(data[`date_to`]);
     this.destinations = data[`destination`];
-    this.id = data[`id`];
     this.isFavorite = data[`is_favorite`];
     this.offers = data[`offers`];
     this.type = data[`type`];
