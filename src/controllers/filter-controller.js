@@ -4,6 +4,7 @@ import {render, replace} from "../utils/render";
 
 export default class FilterController {
   constructor(container, pointsModel) {
+
     this._container = container;
     this._pointsModel = pointsModel;
 
