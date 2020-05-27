@@ -22,6 +22,7 @@ const MONEY_TIME_SPENT_CHART_FACTOR = 7;
 const TRANSPORT_CHART_FACTOR = 5;
 const DEFAULT_RADIX = 10;
 
+
 const monthMap = new Map([
   [0, `JAN`],
   [1, `FEB`],
