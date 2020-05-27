@@ -1,58 +1,106 @@
-import TripInfoComponent from "./components/trip-info.js";
-import CostComponent from "./components/cost.js";
-import MenuComponent from "./components/menu.js";
-import FilterComponent from "./components/filter.js";
-import SortComponent from "./components/sort.js";
-import EventComponent from "./components/event.js";
-import EventEditComponent from "./components/edit.js";
-import {generateFilters} from "./mock/filter.js";
-import {generateEvents} from "./mock/point.js";
-import {render, RenderPosition} from "./utils.js";
+import FilterController from "./controllers/filter-controller";
+import Index from "./api";
+import Menu from "./components/menu";
+import Points from "./models/points";
+import Preloader from "./components/preloader";
+import Provider from "./api/provider";
+import Statistics from "./components/statistics";
+import Store from "./api/store.js";
+import TripController from "./controllers/trip-controller";
+import TripInfo from "./components/trip-info";
 
-const EVENT_COUNT = 15;
+import {render, RenderPosition} from "./utils/render";
+import {removeComponent} from "./utils/common";
+import {FilterType as filters, MenuItem, AUTHORIZATION, END_POINT, STORE_NAME} from "./const";
+import {getPointsByFilter} from "./utils/filter";
 
-const renderEvent = (eventListElement, event, index) => {
+const api = new Index(END_POINT, AUTHORIZATION);
+const store = new Store(STORE_NAME, window.localStorage);
+const apiWithProvider = new Provider(api, store);
+const pointsModel = new Points();
+const preloaderComponent = new Preloader();
 
-  const onEditButtonClick = () => {
-    eventListElement.replaceChild(eventEditComponent.getElement(), eventComponent.getElement());
-    const editForm = document.querySelector(`.event--edit`);
-    editForm.addEventListener(`submit`, onEditFormSubmit);
+const siteHeader = document.querySelector(`.trip-main`);
+const siteMain = document.querySelector(`.page-main`);
+const tripControls = siteHeader.querySelector(`.trip-controls`);
+const tripControlsHeader = tripControls.querySelector(`h2`);
+const tripEvents = siteMain.querySelector(`.trip-events`);
+const newEventButton = document.querySelector(`.trip-main__event-add-btn`);
+const siteMenu = new Menu();
+const tripInfo = new TripInfo(pointsModel);
+
+render(siteHeader, tripInfo, RenderPosition.AFTERBEGIN);
+render(tripControlsHeader, siteMenu, RenderPosition.AFTEREND);
+render(tripEvents, preloaderComponent);
+
+const filterController = new FilterController(tripControls, pointsModel);
+
+const tripController = new TripController(tripEvents, filterController, pointsModel, apiWithProvider);
+apiWithProvider.getData()
+  .then((points) => {
+    pointsModel.setPoints(points.events);
+    pointsModel.setOffersByType(points.offers);
+    pointsModel.setDestinations(points.destinations);
+    removeComponent(preloaderComponent);
+    Object.values(filters).map((filter) => {
+      const filteredPoints = getPointsByFilter(pointsModel.getPointsAll(), filter.toLowerCase());
+      if (filteredPoints.length === 0) {
+        return filterController.disableEmptyFilter(filter.toLowerCase());
+      }
+      return filterController.render();
+    });
+    tripController.renderTripList();
+  });
+
+pointsModel.setDataChangeHandler(() => {
+  removeComponent(tripInfo);
+  render(siteHeader, tripInfo, RenderPosition.AFTERBEGIN);
+});
+
+newEventButton.addEventListener(`click`, (evt) => {
+  evt.preventDefault();
+  filterController.setDefaultView(true);
+  tripController.createPoint(newEventButton);
+});
+
+const statisticsComponent = new Statistics({points: pointsModel});
+render(tripEvents, statisticsComponent, RenderPosition.AFTEREND);
+statisticsComponent.hide();
+
+siteMenu.setOnTripTabsChange((menuItem) => {
+  const setCurrentView = (menu, oldElement, newElement) => {
+    siteMenu.setActiveItem(menu);
+    filterController.setDefaultView(menu);
+    oldElement.hide();
+    newElement.show();
   };
 
-  const onEditFormSubmit = (evt) => {
-    evt.preventDefault();
-    eventListElement.replaceChild(eventComponent.getElement(), eventEditComponent.getElement());
-  };
+  switch (menuItem) {
+    case MenuItem.TABLE:
+      setCurrentView(MenuItem.TABLE, statisticsComponent, tripController);
+      newEventButton.removeAttribute(`disabled`);
+      break;
+    case MenuItem.STATISTICS:
+      setCurrentView(MenuItem.STATISTICS, tripController, statisticsComponent);
+      filterController.removeChecked();
+      newEventButton.setAttribute(`disabled`, `disabled`);
+      break;
+  }
+});
 
+window.addEventListener(`load`, () => {
+  navigator.serviceWorker.register(`./sw.js`)
+    .then(() => {})
+    .catch(() => {});
+});
 
-  const eventComponent = new EventComponent(event, index);
-  const rollupButton = eventComponent.getElement().querySelector(`.event__rollup-btn`);
-  rollupButton.addEventListener(`click`, onEditButtonClick);
+window.addEventListener(`online`, () => {
+  document.title = document.title.replace(` [offline]`, ``);
 
-  const eventEditComponent = new EventEditComponent(event, index);
+  apiWithProvider.sync();
+});
 
-  render(eventListElement, eventComponent.getElement(), RenderPosition.BEFOREEND);
-};
-
-const filters = generateFilters();
-const events = generateEvents(EVENT_COUNT);
-
-const tripMain = document.querySelector(`.trip-main`);
-const tripControls = tripMain.querySelector(`.trip-controls`);
-const tripEvents = document.querySelector(`.trip-events`);
-
-render(tripMain, new TripInfoComponent().getElement(), RenderPosition.AFTERBEGIN);
-
-const tripInfo = document.querySelector(`.trip-info`);
-
-render(tripInfo, new CostComponent().getElement(), RenderPosition.BEFOREEND);
-render(tripControls, new MenuComponent().getElement(), RenderPosition.AFTERBEGIN);
-render(tripControls, new FilterComponent(filters).getElement(), RenderPosition.BEFOREEND);
-
-render(tripEvents, new SortComponent().getElement(), RenderPosition.BEFOREEND);
-
-for (let i = 1; i < events.length; i++) {
-  renderEvent(tripEvents, events[i], i);
-}
-
+window.addEventListener(`offline`, () => {
+  document.title += ` [offline]`;
+});
 

@@ -1,31 +1,33 @@
-import {createElement} from "../utils.js";
+import AbstractComponent from "./abstract-component";
 
 const createMenuTemplate = () => {
   return (
     `<nav class="trip-controls__trip-tabs  trip-tabs">
       <a class="trip-tabs__btn  trip-tabs__btn--active" href="#">Table</a>
       <a class="trip-tabs__btn" href="#">Stats</a>
-     </nav>`
+    </nav>`
   );
 };
 
-export default class Menu {
-  constructor() {
-    this._element = null;
-  }
-
+export default class Menu extends AbstractComponent {
   getTemplate() {
     return createMenuTemplate();
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
+  setActiveItem(menuItem) {
+    const items = this.getElement().querySelectorAll(`.trip-tabs__btn`);
+
+    items.forEach((item) => {
+      return item.innerHTML === menuItem ? item.classList.add(`trip-tabs__btn--active`) : item.classList.remove(`trip-tabs__btn--active`);
+    });
   }
 
-  removeElement() {
-    this._element = null;
+  setOnTripTabsChange(handler) {
+    this.getElement().querySelectorAll(`.trip-tabs__btn`).forEach((item) => {
+      item.addEventListener(`click`, (evt) => {
+        const menuItem = evt.target.innerHTML;
+        handler(menuItem);
+      });
+    });
   }
 }

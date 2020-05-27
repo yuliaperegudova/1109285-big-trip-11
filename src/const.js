@@ -1,131 +1,116 @@
-export const CITIES = [`Rome`, `Amsterdam`, `Paris`, `Barselona`, `Moscow`, `Porto`, `Bratislava`, `Berlin`, `London`];
+const TRANSFER_EVENTS = 7;
+const ACTIVITY_EVENTS = 10;
+const MAX_ISO_STRING_LENGTH = 16;
+const MAX_SHOWING_OFFERS = 3;
+const FIRST_DAY_COUNTER = 1;
+const SHAKE_ANIMATION_TIMEOUT = 600;
+const FILTER_ID_PREFIX = `filter-`;
+const HIDDEN_CLASS = `visually-hidden`;
+const BAR_HEIGHT = 55;
+const AUTHORIZATION = `Basic Llan­fair­pwn­gyll­ge­rych­rnro­bwlll­­si­lio­go­goch`;
+const END_POINT = `https://11.ecmascript.pages.academy/big-trip`;
+const STORE_PREFIX = `big-trip-localstorage`;
+const STORE_VER = `v1`;
+const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
+const MIN_BAR_LENGTH = 50;
+const BAR_THICKNESS = 44;
+const DATALABELS_SIZE = 13;
+const TITLE_FONT_SIZE = 23;
+const TICKS_PADDING = 5;
+const TICKS_FONT_SIZE = 13;
+const MONEY_TIME_SPENT_CHART_FACTOR = 7;
+const TRANSPORT_CHART_FACTOR = 5;
+const DEFAULT_RADIX = 10;
 
-export const MONTH_NAMES = [
-  `Jan`,
-  `Feb`,
-  `Mar`,
-  `Apr`,
-  `May`,
-  `Jun`,
-  `Jul`,
-  `Aug`,
-  `Sep`,
-  `Oct`,
-  `Nov`,
-  `Dec`,
-];
+const monthMap = new Map([
+  [0, `JAN`],
+  [1, `FEB`],
+  [2, `MAR`],
+  [3, `APR`],
+  [4, `MAY`],
+  [5, `JUN`],
+  [6, `JUL`],
+  [7, `AUG`],
+  [8, `SEP`],
+  [9, `OCT`],
+  [10, `NOV`],
+  [11, `DEC`],
+]);
 
-export const DESCRIPTIONS = [
-  `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
-  `Cras aliquet varius magna, non porta ligula feugiat eget.`,
-  `Fusce tristique felis at fermentum pharetra.`,
-  `Aliquam id orci ut lectus varius viverra.`,
-  `Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.`
-];
-
-export const eventTypes = [
-  {
-    name: `Taxi`,
-    group: `Transfer`
-  },
-  {
-    name: `Bus`,
-    group: `Transfer`
-  },
-  {
-    name: `Train`,
-    group: `Transfer`
-  },
-  {
-    name: `Ship`,
-    group: `Transfer`
-  },
-  {
-    name: `Transport`,
-    group: `Transfer`
-  },
-  {
-    name: `Drive`,
-    group: `Transfer`
-  },
-  {
-    name: `Flight`,
-    group: `Transfer`
-  },
-  {
-    name: `Check-in`,
-    group: `Activity`
-  },
-  {
-    name: `Sightseeing`,
-    group: `Activity`
-  },
-  {
-    name: `Restaurant`,
-    group: `Activity`
-  }
-];
-
-export const offersByEventsType = {
-  flight: [
-    {
-      name: `luggage`,
-      title: `Add luggage`,
-      price: 50
-    },
-    {
-      name: `comfort`,
-      title: `Switch to comfort`,
-      price: 100
-    },
-    {
-      name: `meal`,
-      title: `Add meal`,
-      price: `100`
-    },
-    {
-      name: `seats`,
-      title: `Choose seats`,
-      price: 5
-    },
-    {
-      name: `train`,
-      title: `Travel by train`,
-      price: 40
-    }
-  ],
-  drive: [
-    {
-      name: `car`,
-      title: `Rent a car`,
-      price: 200
-    }
-  ],
-  [`check-in`]: [
-    {
-      name: `breakfast`,
-      title: `Add breakfast`,
-      price: 50
-    }
-  ],
-  sightseeing: [
-    {
-      name: `tickets`,
-      title: `Book tickets`,
-      price: 40
-    },
-    {
-      name: `lunch`,
-      title: `Lunch in city`,
-      price: 30
-    }
-  ],
-  taxi: [
-    {
-      name: `uber`,
-      title: `Order Uber`,
-      price: 20
-    }
-  ]
+const EventType = {
+  TAXI: `Taxi`,
+  BUS: `Bus`,
+  TRAIN: `Train`,
+  SHIP: `Ship`,
+  TRANSPORT: `Transport`,
+  DRIVE: `Drive`,
+  FLIGHT: `Flight`,
+  CHECK_IN: `Check-in`,
+  SIGHTSEEING: `Sightseeing`,
+  RESTAURANT: `Restaurant`
 };
 
+const EVENT_TYPES = Object.values(EventType);
+
+const EventSuffix = {
+  TAXI: `to `,
+  BUS: `to `,
+  TRAIN: `to `,
+  SHIP: `to `,
+  TRANSPORT: `to `,
+  DRIVE: `to `,
+  FLIGHT: `to `,
+  CHECK_IN: `in `,
+  SIGHTSEEING: `in `,
+  RESTAURANT: `in `
+};
+
+const iconMap = {
+  'taxi': `🚕`,
+  'bus': `🚌`,
+  'train': `🚂`,
+  'ship': `🛳`,
+  'transport': `🚊`,
+  'drive': `🚗`,
+  'flight': `✈`,
+  'check-in': `🏨`,
+  'sightseeing': `🏛️`,
+  'restaurant': `🍴`
+};
+
+const FilterType = {
+  EVERYTHING: `everything`,
+  FUTURE: `future`,
+  PAST: `past`
+};
+
+const DefaultData = {
+  deleteButtonText: `Delete`,
+  saveButtonText: `Save`
+};
+
+const Method = {
+  GET: `GET`,
+  POST: `POST`,
+  PUT: `PUT`,
+  DELETE: `DELETE`
+};
+
+const MenuItem = {
+  TABLE: `Table`,
+  STATISTICS: `Stats`
+};
+
+const SortType = {
+  EVENT: `sort-event`,
+  TIME: `sort-time`,
+  PRICE: `sort-price`,
+};
+
+const Mode = {
+  ADDING: `adding`,
+  DEFAULT: `default`,
+  EDIT: `edit`
+};
+
+export {FILTER_ID_PREFIX, monthMap, EVENT_TYPES, EventSuffix, TRANSFER_EVENTS, ACTIVITY_EVENTS, MAX_ISO_STRING_LENGTH, MAX_SHOWING_OFFERS, FIRST_DAY_COUNTER, HIDDEN_CLASS, FilterType, iconMap, SHAKE_ANIMATION_TIMEOUT, DefaultData, Method, MenuItem, SortType, BAR_HEIGHT, Mode, AUTHORIZATION, END_POINT, STORE_NAME, MIN_BAR_LENGTH, BAR_THICKNESS, DATALABELS_SIZE, TITLE_FONT_SIZE, TICKS_PADDING, TICKS_FONT_SIZE, MONEY_TIME_SPENT_CHART_FACTOR, TRANSPORT_CHART_FACTOR, DEFAULT_RADIX};

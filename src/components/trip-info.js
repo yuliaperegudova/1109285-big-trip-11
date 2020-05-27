@@ -1,34 +1,33 @@
-import {createElement} from "../utils.js";
+import AbstractComponent from "./abstract-component";
+import {getFullCost, getRoute, getRouteDates} from "../utils/trip-info";
 
-const createTripInfoTemplate = () => {
+const createTripInfoTemplate = (points) => {
+  const route = (points.length > 0) ? getRoute(points) : ``;
+  const dates = (points.length > 0) ? getRouteDates(points) : ``;
+  const cost = (points.length > 0) ? getFullCost(points) : ``;
+
   return (
     `<section class="trip-main__trip-info  trip-info">
       <div class="trip-info__main">
-        <h1 class="trip-info__title">Amsterdam &mdash; Chamonix &mdash; Geneva</h1>
+        <h1 class="trip-info__title">${route}</h1>
 
-        <p class="trip-info__dates">Mar 18&nbsp;&mdash;&nbsp;20</p>
+        <p class="trip-info__dates">${dates}</p>
       </div>
+
+      <p class="trip-info__cost">
+        Total: &euro;&nbsp;<span class="trip-info__cost-value">${cost}</span>
+      </p>
     </section>`
   );
 };
 
-export default class TripInfo {
-  constructor() {
-    this._element = null;
+export default class TripInfo extends AbstractComponent {
+  constructor(pointsModel) {
+    super();
+    this._pointsModel = pointsModel;
   }
 
   getTemplate() {
-    return createTripInfoTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+    return createTripInfoTemplate(this._pointsModel.getPointsAll());
   }
 }

@@ -1,92 +1,100 @@
-import {MONTH_NAMES} from "../const.js";
-import {formatTime, formatTimeFromMs, createElement} from "../utils.js";
+import {EventSuffix, MAX_ISO_STRING_LENGTH, MAX_SHOWING_OFFERS} from "../const";
+import {checkSuffix, formatTime, getDurationDate} from "../utils/common";
+import AbstractComponent from "./abstract-component";
 
-const createOptionsMarkup = (events) => {
-  if (events && events.length) {
-    const options = events
-      .slice(0, 3)
-      .map((event) =>
-        `<li class="event__offer">
-            <span class="event__offer-title">${event.title}</span>
-            &plus;
-            &euro;&nbsp;<span class="event__offer-price">${event.price}</span>
-        </li>`
-      )
-      .join(`\n`);
+const createEventMarkup = (tripEvent) => {
+  const {type, time, price, offers, destination} = tripEvent;
+  const {eventStartTime, eventEndTime} = time;
+
+  const getSelectedOffers = () => {
+    return offers ? offers.slice(0, MAX_SHOWING_OFFERS).map((offer) => {
+      return `<li class="event__offer">
+        <span class="event__offer-title">${offer.title}</span>
+        &plus;
+        &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
+       </li>`;
+    }).join(`\n`) : ``;
+  };
+
+  const getDurationTime = () => {
+    const duration = getDurationDate(eventStartTime, eventEndTime);
+    const durationMinutes = duration.minutes();
+    const durationHours = duration.hours();
+    const durationDays = duration.days();
+
+    if (durationDays > 0) {
+      if (durationHours > 0) {
+        return `${durationDays}D ${durationHours}H ${durationMinutes}M`;
+      }
+      return `${durationDays}D 0H ${durationMinutes}M`;
+    } else if (durationHours > 0) {
+      return `${durationHours}H ${durationMinutes}M`;
+    }
+    return `${durationMinutes}M`;
+  };
+
+  const eventTimeMarkup = () => {
+    const startISOString = eventStartTime.toISOString().slice(0, MAX_ISO_STRING_LENGTH);
+    const endISOString = eventEndTime.toISOString().slice(0, MAX_ISO_STRING_LENGTH);
+
     return (
-      `<h4 class="visually-hidden">Offers:</h4>
-       <ul class="event__selected-offers">
-         ${options}
-       </ul>`
+      `<p class="event__time">
+        <time class="event__start-time" datetime="${startISOString}">${formatTime(eventStartTime)}</time>
+        &mdash;
+        <time class="event__end-time" datetime="${endISOString}">${formatTime(eventEndTime)}</time>
+      </p>
+       <p class="event__duration">${getDurationTime()}</p>`
     );
-  } else {
-    return ``;
-  }
-};
+  };
 
-const createEventMarkup = (event, index) => {
-  const {eventType, city, eventOptions, price, dateStart, dateEnd} = event;
-  const timeStartFormatted = formatTime(dateStart);
-  const timeEndFormatted = formatTime(dateEnd);
-  const durationFormatted = formatTimeFromMs(dateEnd - dateStart);
-  const preposition = eventType.group === `Transfer` ? `to` : `in`;
   return (
-    `<ul class="trip-days">
-    <li class="trip-days__item  day">
-      <div class="day__info">
-        <span class="day__counter">${index}</span>
-        <time class="day__date" datetime="2019-03-18">${MONTH_NAMES[dateStart.getMonth()]} ${dateStart.getDate()}</time>
+    `<div class="event">
+      <div class="event__type">
+        <img class="event__type-icon" width="42" height="42" src="img/icons/${type.toLowerCase()}.png" alt="Event type icon">
+      </div>
+      <h3 class="event__title">${type} ${EventSuffix[checkSuffix(type)]} ${destination.currentCity}</h3>
+
+      <div class="event__schedule">
+      ${eventTimeMarkup()}
       </div>
 
-    <ul class="trip-events__list">
-    <li class="trip-events__item">
-      <div class="event">
-        <div class="event__type">
-                 <img class="event__type-icon" width="42" height="42" src="img/icons/${eventType.name.toLowerCase()}.png" alt="Event type icon">
-               </div>
-        <h3 class="event__title">${eventType.name} ${preposition} ${city}</h3>
-        <div class="event__schedule">
-          <p class="event__time">
-            <time class="event__start-time" datetime="${dateStart.toISOString().slice(0, 13)}">${timeStartFormatted}</time>
-                 &mdash;
-            <time class="event__end-time" datetime="${dateEnd.toISOString().slice(0, 13)}">${timeEndFormatted}</time>
-          </p>
-          <p class="event__duration">${durationFormatted}</p>
-          </div>
-          <p class="event__price">
-            &euro;&nbsp;<span class="event__price-value">${price}</span>
-          </p>
-          ${createOptionsMarkup(eventOptions)}
-          <button class="event__rollup-btn" type="button">
-            <span class="visually-hidden">Open event</span>
-          </button>
-        </div>
-    </li>
-    </ul>`
+      <p class="event__price">
+        &euro;&nbsp;<span class="event__price-value">${price}</span>
+      </p>
+
+      <h4 class="visually-hidden">Offers:</h4>
+      <ul class="event__selected-offers">
+        ${getSelectedOffers()}
+      </ul>
+
+      <button class="event__rollup-btn" type="button">
+        <span class="visually-hidden">Open event</span>
+      </button>
+    </div>`
   );
 };
 
-export default class Event {
-  constructor(event, index) {
+const createTripEventsTemplate = (tripEvent) => {
+  return (
+    `<li class="trip-events__item">
+        ${createEventMarkup(tripEvent)}
+      </li>`
+  );
+};
+
+export default class TripEvents extends AbstractComponent {
+  constructor(event) {
+    super();
+
     this._event = event;
-    this._index = index;
-    this._element = null;
   }
 
   getTemplate() {
-    return createEventMarkup(this._event, this._index); // нужно добавить индекс
+    return createTripEventsTemplate(this._event);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setEditButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__rollup-btn`)
+      .addEventListener(`click`, handler);
   }
 }
-
-
