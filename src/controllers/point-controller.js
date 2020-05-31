@@ -40,7 +40,7 @@ const parseFormData = (formData, destinations, offersByType, eventData) => {
   }, reduseDefaultOffers);
 
   const formatChoosenOffers = () => {
-    let offers = [];
+    const offers = [];
     offersByType.get(formData.get(`event-type`)).forEach((offer) => {
       for (const offerId in reduseChoosenOffers) {
         if (offer.id === offerId) {
