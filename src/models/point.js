@@ -1,37 +1,53 @@
+import {formatOfferTitleToId, formatString, formatOffers} from "../utils/common";
+
 export default class Point {
-  constructor(data) {
-    this.id = data[`id`];
-    this.basePrice = data[`base_price`];
-    this.timeStart = new Date(data[`date_from`]);
-    this.timeEnd = new Date(data[`date_to`]);
-    this.destinations = data[`destination`];
-    this.isFavorite = data[`is_favorite`];
-    this.offers = data[`offers`];
-    this.type = data[`type`];
+  constructor(point) {
+    this.id = point[`id`];
+    this.type = formatString(point[`type`]);
+    this.time = {
+      eventStartTime: new Date(point[`date_from`]),
+      eventEndTime: new Date(point[`date_to`]),
+    };
+    this.price = point[`base_price`];
+    this.offers = point[`offers`].map((offer) => {
+      return Object.assign({}, offer, {
+        id: formatOfferTitleToId(offer.title)
+      });
+    });
+    this.destination = {
+      description: point[`destination`][`description`],
+      photos: point[`destination`][`pictures`],
+      currentCity: point[`destination`][`name`]
+    };
+    this.isFavorite = point[`is_favorite`];
   }
 
   toRAW() {
     return {
-      "base_price": this.basePrice,
-      "date_from": this.timeStart.toISOString(),
-      "date_to": this.timeEnd.toISOString(),
-      "destination": this.destinations,
-      "id": this.id,
-      "is_favorite": this.isFavorite,
-      "offers": this.offers,
-      "type": this.type
+      "id": this.id.toString(),
+      "type": this.type.toLowerCase(),
+      "date_from": this.time.eventStartTime.toISOString(),
+      "date_to": this.time.eventEndTime.toISOString(),
+      "base_price": parseInt(this.price, 10),
+      "offers": this.offers ? formatOffers(this.offers) : null,
+      "destination": this.destination ? {
+        "name": this.destination.currentCity,
+        "pictures": this.destination.photos,
+        "description": this.destination.description
+      } : null,
+      "is_favorite": this.isFavorite
     };
   }
 
-  static parsePoint(data) {
-    return new Point(data);
+  static parsePoint(point) {
+    return new Point(point);
   }
 
-  static parsePoints(data) {
-    return data.map(Point.parsePoint);
+  static parsePoints(points) {
+    return points.map(Point.parsePoint);
   }
 
-  static clone(data) {
-    return new Point(data.toRAW());
+  static clone(point) {
+    return new Point(point.toRAW());
   }
 }

@@ -348,4 +348,3 @@ export default class Statistics extends AbstractSmartComponent {
     }
   }
 }
-

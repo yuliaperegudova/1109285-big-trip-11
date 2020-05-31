@@ -1,17 +1,17 @@
 import AbstractComponent from "./abstract-component";
 
-const createPreloaderTemplate = () => {
+const createLoadTemplate = () => {
   return (
     `<p class="trip-events__msg">Loading...</p>`
   );
 };
 
-export default class Preloader extends AbstractComponent {
+export default class Loading extends AbstractComponent {
   constructor() {
     super();
   }
 
   getTemplate() {
-    return createPreloaderTemplate();
+    return createLoadTemplate();
   }
 }
