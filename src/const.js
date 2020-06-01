@@ -89,11 +89,6 @@ const DefaultData = {
   SAVE_BTN_TEXT: `Save`
 };
 
-// const DefaultData = {
-//   deleteButtonText: `Delete`,
-//   saveButtonText: `Save`
-// };
-
 const Method = {
   GET: `GET`,
   POST: `POST`,
