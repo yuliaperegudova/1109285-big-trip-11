@@ -4,8 +4,8 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {getDurationDate} from "../utils/common";
 import {iconMap, BAR_HEIGHT, MIN_BAR_LENGTH, BAR_THICKNESS, DATALABELS_SIZE, TITLE_FONT_SIZE, TICKS_PADDING, TICKS_FONT_SIZE, MONEY_TIME_SPENT_CHART_FACTOR, TRANSPORT_CHART_FACTOR} from "../const";
 
-const getUniqItems = (item, index, arr) => {
-  return arr.indexOf(item) === index;
+const getUniqItems = (item, index, items) => {
+  return items.indexOf(item) === index;
 };
 
 const calcUniqItemsCount = (points, type) => {
