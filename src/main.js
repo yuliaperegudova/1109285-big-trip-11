@@ -2,7 +2,7 @@ import Api from "./api/api";
 import Provider from "./api/provider";
 import Store from "./api/store.js";
 import FilterController from "./controllers/filter-controller";
-import Loading from "./components/load";
+import Preloader from "./components/preloader";
 import Menu from "./components/menu";
 import Points from "./models/points";
 import Statistics from "./components/statistics";
@@ -17,7 +17,7 @@ const api = new Api(END_POINT, AUTHORIZATION);
 const store = new Store(STORE_NAME, window.localStorage);
 const apiWithProvider = new Provider(api, store);
 const pointsModel = new Points();
-const loadingComponent = new Loading();
+const loadingComponent = new Preloader();
 
 const tripMain = document.querySelector(`.trip-main`);
 const pageMain = document.querySelector(`.page-main`);

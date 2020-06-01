@@ -44,8 +44,8 @@ export default class Api {
       this.getDestinations(),
       this.getOffers(),
     ])
-      .then((responce) => {
-        const [events, destinations, offers] = responce;
+      .then((response) => {
+        const [events, destinations, offers] = response;
         const formatDestinations = destinations.map((destination) => {
           return {
             currentCity: destination.name,

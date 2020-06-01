@@ -7,7 +7,7 @@ const SHAKE_ANIMATION_TIMEOUT = 600;
 const HIDDEN_CLASS = `visually-hidden`;
 const FILTER_ID_PREFIX = `filter-`;
 const BAR_HEIGHT = 55;
-const AUTHORIZATION = `Basic Fhngkgkgkeepflgbbfdjd`;
+const AUTHORIZATION = `Basic Fhngkgffltlfaasdkgbbfdjd`;
 const END_POINT = `https://11.ecmascript.pages.academy/big-trip`;
 const STORE_PREFIX = `big-trip-localstorage`;
 const STORE_VER = `v1`;
@@ -85,9 +85,14 @@ const FilterType = {
 };
 
 const DefaultData = {
-  deleteButtonText: `Delete`,
-  saveButtonText: `Save`
+  DELETE_BTN_TEXT: `Delete`,
+  SAVE_BTN_TEXT: `Save`
 };
+
+// const DefaultData = {
+//   deleteButtonText: `Delete`,
+//   saveButtonText: `Save`
+// };
 
 const Method = {
   GET: `GET`,

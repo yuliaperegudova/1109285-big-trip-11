@@ -7,14 +7,15 @@ const createEventMarkup = (tripEvent) => {
   const {eventStartTime, eventEndTime} = time;
 
   const getSelectedOffers = () => {
-    return offers ? offers.slice(0, MAX_SHOWING_OFFERS).map((offer) => {
-      return `<li class="event__offer">
-        <span class="event__offer-title">${offer.title}</span>
-        &plus;
-        &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
-       </li>`;
-    }).join(`\n`) : ``;
+    return offers.slice(0, MAX_SHOWING_OFFERS).map((offer) => {
+      return offer.required ? `<li class="event__offer">
+      <span class="event__offer-title">${offer.title}</span>
+      &plus;
+      &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
+     </li>` : ``;
+    }).join(`\n`);
   };
+
 
   const getDurationTime = () => {
     const duration = getDurationDate(eventStartTime, eventEndTime);
@@ -74,15 +75,15 @@ const createEventMarkup = (tripEvent) => {
   );
 };
 
-const createTripEventsTemplate = (tripEvent) => {
+const createTripEventsTemplate = (event) => {
   return (
     `<li class="trip-events__item">
-        ${createEventMarkup(tripEvent)}
+        ${createEventMarkup(event)}
       </li>`
   );
 };
 
-export default class TripEvents extends AbstractComponent {
+export default class Event extends AbstractComponent {
   constructor(event) {
     super();
 

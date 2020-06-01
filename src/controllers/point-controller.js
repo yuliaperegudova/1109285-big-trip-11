@@ -1,5 +1,5 @@
-import TripEvents from "../components/event";
-import NewEvent from "../components/event-edit";
+import Event from "../components/event";
+import EventEdit from "../components/event-edit";
 import {replace, remove} from "../utils/render";
 import {formatDateToDefault, formatString, parseDestinationInfo, removeComponent} from "../utils/common";
 import Point from "../models/point";
@@ -92,15 +92,15 @@ export default class PointController {
     this._mode = mode;
     this._button = newEventBtn;
 
-    this._currentEvent = new TripEvents(event);
-    this._eventEditComponent = new NewEvent(event, this._mode, this._pointsModel);
+    this._currentEvent = new Event(event);
+    this._eventEditComponent = new EventEdit(event, this._mode, this._pointsModel);
 
     this._currentEvent.setEditButtonClickHandler(() => {
       this._replaceEventToEdit();
       document.addEventListener(`keydown`, this._onEscKeyDown);
     });
 
-    this._eventEditComponent.setCloseButtonClickHandler(() => {
+    this._eventEditComponent.setCloseButtonClickHandler(() => { // здесь глянуть
       if (this._mode === Mode.ADDING) {
         this._onDataChange(this, event, null, false, this._button);
         return;
@@ -197,7 +197,7 @@ export default class PointController {
 
   _replaceEditToEvent() {
     document.removeEventListener(`keydown`, this._onEscKeyDown);
-    this._eventEditComponent.rerender();
+    this._eventEditComponent.reset();
     if (document.contains(this._eventEditComponent.getElement())) {
       if (this._eventEditComponent.getCurrentMode() === Mode.ADDING) {
         removeComponent(this._eventEditComponent);

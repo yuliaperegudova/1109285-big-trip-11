@@ -18,8 +18,8 @@ const createEventEditTemplate = (newEvent, options = {}) => {
   const price = encode(notSanitizedPrice.toString());
   const currentCity = encode(notSanitizedCurrentCity);
 
-  const deleteButtonText = externalData.deleteButtonText;
-  const saveButtonText = externalData.saveButtonText;
+  const deleteButtonText = externalData.DELETE_BTN_TEXT;
+  const saveButtonText = externalData.SAVE_BTN_TEXT;
 
   const renderPhotosMarkup = () => {
     return photos.map((photo) => {
@@ -170,7 +170,7 @@ const createEventEditTemplate = (newEvent, options = {}) => {
   );
 };
 
-export default class NewEvent extends AbstractSmartComponent {
+export default class EventEdit extends AbstractSmartComponent {
   constructor(event, mode, pointsModel) {
     super();
 
@@ -240,6 +240,20 @@ export default class NewEvent extends AbstractSmartComponent {
     this._applyFlatpickr();
   }
 
+  reset() {
+    const event = this._event;
+
+    this._eventType = event.type;
+    this._eventOffers = event.offers.slice();
+    this._destinations = this._pointsModel.getDestinations();
+    this._eventStartDate = event.time.eventStartTime;
+    this._eventEndDate = event.time.eventEndTime;
+    this._eventPrice = event.price;
+    this._offersByType = this._pointsModel.getOffersByType();
+
+    this.rerender();
+  }
+
   getData() {
     const form = this.getElement().querySelector(`form`);
     return new FormData(form);
@@ -303,7 +317,7 @@ export default class NewEvent extends AbstractSmartComponent {
     this._closeButtonClickHandler = handler;
   }
 
-  _makeFlatpickrElement(eventDate) {
+  _makeFlatpickrElement(eventDate, minDate, maxDate) {
     return {
       altInput: true,
       allowInput: true,
@@ -312,16 +326,17 @@ export default class NewEvent extends AbstractSmartComponent {
       dateFormat: `d/m/Y H:i`,
       altFormat: `d/m/Y H:i`,
       defaultDate: eventDate,
+      minDate,
+      maxDate,
     };
   }
 
   setFlatpickr(dateElement, eventDate) {
     if (dateElement.id.match(/(start)/g)) {
-      this._flatpickrStartTime = flatpickr(dateElement, this._makeFlatpickrElement(eventDate));
+      this._flatpickrStartTime = flatpickr(dateElement, this._makeFlatpickrElement(eventDate, null, null));
     } else {
-      this._flatpickrEndTime = flatpickr(dateElement, this._makeFlatpickrElement(eventDate));
+      this._flatpickrEndTime = flatpickr(dateElement, this._makeFlatpickrElement(eventDate, this._eventStartDate, null));
     }
-
   }
 
   _applyFlatpickr() {
@@ -357,10 +372,15 @@ export default class NewEvent extends AbstractSmartComponent {
 
     startTime.addEventListener(`change`, (evt) => {
       this._eventStartDate = formatDateToDefault(evt.target.value);
+      if (this._eventEndDate < this._eventStartDate) {
+        this._eventEndDate = this._eventStartDate;
+      }
+      this.rerender();
     });
 
     endTime.addEventListener(`change`, (evt) => {
       this._eventEndDate = formatDateToDefault(evt.target.value);
+      this.rerender();
     });
 
     element.addEventListener(`click`, () => {
@@ -390,7 +410,7 @@ export default class NewEvent extends AbstractSmartComponent {
       evt.preventDefault();
       const index = this._destinations.findIndex((destination) => destination.currentCity === evt.target.value);
       if (index === -1) {
-        eventDestination.setCustomValidity(`Выберете город из списка`);
+        eventDestination.setCustomValidity(`Выберите город из списка`);
         return;
       }
       this._eventDestination = this._destinations[index];
